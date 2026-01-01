@@ -1,4 +1,15 @@
 import express from "express";
+import pkg from "pg";
+import dotenv from "dotenv";
+import cors from "cors";
+
+dotenv.config();
+
+const { Pool } = pkg;
+
+const app = express();
+app.use(cors());
+app.use(express.json());
 app.use(cors({
   origin: [
     "http://localhost:5173",
@@ -8,17 +19,6 @@ app.use(cors({
   methods: ["GET", "POST"],
   credentials: false
 }));
-
-import pkg from "pg";
-import dotenv from "dotenv";
-
-dotenv.config();
-
-const { Pool } = pkg;
-
-const app = express();
-app.use(cors());
-app.use(express.json());
 
 // PostgreSQL
 // const pool = new Pool({
