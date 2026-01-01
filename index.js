@@ -5,7 +5,7 @@ import cors from "cors";
 
 dotenv.config();
 
-const { Pool } = pkg;
+
 
 const app = express();
 app.use(cors());
@@ -20,19 +20,23 @@ app.use(cors({
   credentials: false
 }));
 
-// PostgreSQL
-// const pool = new Pool({
-//   host: process.env.DB_HOST || "localhost",
-//   user: process.env.DB_USER || "postgres",
-//   password: process.env.DB_PASSWORD || "123456",
-//   database: process.env.DB_NAME || "NafisGym",
-//   port: process.env.DB_PORT || 5432,
-// });
+const { Pool } = pkg;
+
+const pool = new Pool({
+  host: process.env.DB_HOST,
+  user: process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_NAME,
+  port: process.env.DB_PORT,
+  ssl: {
+    rejectUnauthorized: false
+  }
+});
 
 // test DB
-// pool.query("SELECT NOW()")
-//   .then(r => console.log("DB connected:", r.rows[0]))
-//   .catch(e => console.error("DB ERROR:", e));
+pool.query("SELECT NOW()")
+  .then(r => console.log("DB connected:", r.rows[0]))
+  .catch(e => console.error("DB ERROR:", e));
 
 // test route
 app.get("/", (req, res) => {
@@ -45,40 +49,29 @@ app.get("/health", (req, res) => {
 
 // contact API
 app.post("/contact", async (req, res) => {
-  // try {
-  //   const { name, email, message } = req.body;
+  try {
+    const { name, email, message } = req.body;
 
-  //   if (!name || !email || !message) {
-  //     return res.status(400).json({ error: "All fields required" });
-  //   }
+    if (!name || !email || !message) {
+      return res.status(400).json({ error: "All fields required" });
+    }
 
-  //   const result = await pool.query(
-  //     `INSERT INTO aboutproject (name, email, message) VALUES ($1,$2,$3) RETURNING *`,
-  //     [name, email, message]
-  //   );
+    const result = await pool.query(
+      `INSERT INTO aboutproject (name, email, message) VALUES ($1,$2,$3) RETURNING *`,
+      [name, email, message]
+    );
 
-  //   return res.status(201).json({
-  //     success: true,
-  //     id: result.rows[0].id,
-  //     message: "Message saved"
-  //   });
+    return res.status(201).json({
+      success: true,
+      id: result.rows[0].id,
+      message: "Message saved"
+    });
 
-  // } catch (err) {
-  //   console.error("CONTACT ERROR:", err);
-  //   return res.status(500).json({ error: "Server error" });
-  // }
-  const { name, email, message } = req.body;
-
-  if (!name || !email || !message) {
-    return res.status(400).json({ error: "All fields required" });
+  } catch (err) {
+    console.error("CONTACT ERROR:", err);
+    return res.status(500).json({ error: "Server error" });
   }
-
-  console.log("CONTACT FORM DATA:", { name, email, message });
-
-  return res.status(200).json({
-    success: true,
-    message: "Message received (no DB yet)"
-  });
+  
 });
 
 const PORT = process.env.PORT || 5000;
