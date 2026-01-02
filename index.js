@@ -13,11 +13,10 @@ app.use(express.json());
 app.use(cors({
   origin: [
     "http://localhost:5173",
-    "http://localhost:3000",
-    "https://YOUR-NETLIFY-SITE.netlify.app"
+    "https://mdnafisportfolio.netlify.app/"
   ],
-  methods: ["GET", "POST"],
-  credentials: false
+  methods: ["GET", "POST", "PUT", "DELETE"],
+  credentials: true
 }));
 
 const { Pool } = pkg;
