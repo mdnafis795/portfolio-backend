@@ -32,6 +32,8 @@ const pool = new Pool({
     rejectUnauthorized: false
   }
 });
+console.log("DB HOST =", process.env.DB_HOST);
+
 
 // test DB
 pool.query("SELECT NOW()")
